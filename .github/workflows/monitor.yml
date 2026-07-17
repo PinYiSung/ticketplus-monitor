@@ -13,8 +13,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
-      - name: 查詢票券並通知
+      - name: 查詢票券並通知（每次觸發後持續查 4 分半，每 20 秒一次）
         env:
           TP_TG_BOT_TOKEN: ${{ secrets.TP_TG_BOT_TOKEN }}
           TP_TG_CHAT_ID: ${{ secrets.TP_TG_CHAT_ID }}
-        run: python3 monitor.py --once
+        run: timeout 270 python3 monitor.py --interval 20 || true

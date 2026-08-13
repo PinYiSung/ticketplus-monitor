@@ -2,8 +2,7 @@ name: TicketPlus 釋票偵測
 
 on:
   schedule:
-    # GitHub 自己的排程不準時，這裡只當備援，主要觸發改由外部 cron 服務呼叫 workflow_dispatch
-    - cron: "0 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch: {}
 
 concurrency:
@@ -13,13 +12,14 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
-      - name: 查詢票券並通知
+      - name: 查詢票券並通知（單次觸發後持續查最多 110 分鐘，每 60 秒一次）
         env:
           TP_TG_BOT_TOKEN: ${{ secrets.TP_TG_BOT_TOKEN }}
           TP_TG_CHAT_ID: ${{ secrets.TP_TG_CHAT_ID }}
-        run: python3 monitor.py --once
+        run: timeout 6600 python3 monitor.py --interval 60 || true
